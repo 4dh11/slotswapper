@@ -1,0 +1,130 @@
+### Variables
+@baseUrl = http://localhost:4000/api
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjbWhrdG56cHgwMDAwdWNsODdiNWtpdWcwIiwiZW1haWwiOiJhbGljZUBkZW1vLmNvbSIsImlhdCI6MTc2MjI3NzA5MCwiZXhwIjoxNzYyODgxODkwfQ.kECtuPF46_OcXYIvDyKdB2ItsG2BoGhTZpVI8Sra2Gw
+### ============================================
+### 1. SIGNUP - Create new user
+POST {{baseUrl}}/auth/signup
+Content-Type: application/json
+
+{
+  "name": "Test User",
+  "email": "test@example.com",
+  "password": "password123"
+}
+
+### ============================================
+### 2. LOGIN - Get token (copy token from response and paste above)
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "password123"
+}
+
+### ============================================
+### 3. LOGIN AS ALICE (demo user from seed)
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "alice@demo.com",
+  "password": "password123"
+}
+
+### ============================================
+### 4. LOGIN AS BOB (demo user from seed)
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "bob@demo.com",
+  "password": "password123"
+}
+
+### ============================================
+### 5. GET MY EVENTS (requires token)
+GET {{baseUrl}}/events
+Authorization: Bearer {{token}}
+
+### ============================================
+### 6. CREATE NEW EVENT
+POST {{baseUrl}}/events
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Dentist Appointment",
+  "startTime": "2025-11-06T09:00:00Z",
+  "endTime": "2025-11-06T10:00:00Z",
+  "status": "BUSY"
+}
+
+### ============================================
+### 7. CREATE SWAPPABLE EVENT
+POST {{baseUrl}}/events
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Gym Session",
+  "startTime": "2025-11-07T18:00:00Z",
+  "endTime": "2025-11-07T19:00:00Z",
+  "status": "SWAPPABLE"
+}
+
+### ============================================
+### 8. UPDATE EVENT - Mark as SWAPPABLE (replace EVENT_ID)
+PATCH {{baseUrl}}/events/EVENT_ID_HERE
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "status": "SWAPPABLE"
+}
+
+### ============================================
+### 9. DELETE EVENT (replace EVENT_ID)
+DELETE {{baseUrl}}/events/EVENT_ID_HERE
+Authorization: Bearer {{token}}
+
+### ============================================
+### 10. GET SWAPPABLE SLOTS FROM OTHER USERS
+GET {{baseUrl}}/swaps/swappable-slots
+Authorization: Bearer {{token}}
+
+### ============================================
+### 11. REQUEST SWAP (replace mySlotId and theirSlotId)
+POST {{baseUrl}}/swaps/swap-request
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "mySlotId": "cmhku9hmx0004uckovctd0xow",
+  "theirSlotId": "cmhku6kxg0002uckofd5s6z56"
+}
+
+### ============================================
+### 12. GET ALL REQUESTS (incoming and outgoing)
+GET {{baseUrl}}/swaps/requests
+Authorization: Bearer {{token}}
+
+### ============================================
+### 13. ACCEPT SWAP REQUEST (replace REQUEST_ID)
+POST {{baseUrl}}/swaps/swap-response/REQUEST_ID_HERE
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "accepted": true
+}
+
+### ============================================
+### 14. REJECT SWAP REQUEST (replace REQUEST_ID)
+POST {{baseUrl}}/swaps/swap-response/cmhku9xfh0006uckoeq01x4n2
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "accepted": false
+}

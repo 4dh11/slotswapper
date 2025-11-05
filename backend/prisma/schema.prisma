@@ -1,0 +1,57 @@
+// prisma/schema.prisma
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id       String        @id @default(cuid())
+  name     String
+  email    String        @unique
+  password String
+  events   Event[]
+  sent     SwapRequest[] @relation("sentRequests")
+  received SwapRequest[] @relation("receivedRequests")
+}
+
+enum EventStatus {
+  BUSY
+  SWAPPABLE
+  SWAP_PENDING
+}
+
+model Event {
+  id              String        @id @default(cuid())
+  title           String
+  startTime       DateTime
+  endTime         DateTime
+  status          EventStatus   @default(BUSY)
+  userId          String
+  owner           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mySlotRequests  SwapRequest[] @relation("mySlot")
+  theirSlotRequests SwapRequest[] @relation("theirSlot")
+}
+
+enum SwapStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+model SwapRequest {
+  id          String     @id @default(cuid())
+  status      SwapStatus @default(PENDING)
+  mySlotId    String
+  theirSlotId String
+  requesterId String
+  recipientId String
+  createdAt   DateTime   @default(now())
+  mySlot      Event      @relation("mySlot", fields: [mySlotId], references: [id], onDelete: Cascade)
+  theirSlot   Event      @relation("theirSlot", fields: [theirSlotId], references: [id], onDelete: Cascade)
+  requester   User       @relation("sentRequests", fields: [requesterId], references: [id], onDelete: Cascade)
+  recipient   User       @relation("receivedRequests", fields: [recipientId], references: [id], onDelete: Cascade)
+}
