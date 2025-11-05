@@ -1,31 +1,27 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL;
+const raw = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+const origin = raw.replace(/\/+$/, '');           // strip trailing slashes
+const base = origin.endsWith('/api') ? origin : `${origin}/api`;
 
 export const api = axios.create({
-  baseURL: `${API_BASE_URL}/api`,  // Now includes /api prefix
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  baseURL: base,
+  headers: { 'Content-Type': 'application/json' },
 });
 
-// Add token to requests automatically
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
+  if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 
-// Handle auth errors
 api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
+  (res) => res,
+  (err) => {
+    if (err.response?.status === 401) {
       localStorage.removeItem('token');
       window.location.href = '/login';
     }
-    return Promise.reject(error);
+    return Promise.reject(err);
   }
 );
